@@ -67,8 +67,6 @@ class GameScene extends Phaser.Scene {
     this.skeletons.push(this.add.existing(new Skeleton(this, 1450, 320, 'walk', 'southWest', 320)));
     this.skeletons.push(this.add.existing(new Skeleton(this, 1500, 340, 'walk', 'southWest', 340)));
     this.skeletons.push(this.add.existing(new Skeleton(this, 1550, 360, 'walk', 'southWest', 330)));
-
-    // this.cameras.main.setSize(1600, 600);
   }
 
   update() {

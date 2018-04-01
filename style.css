@@ -9,10 +9,15 @@ canvas {
   margin: 10px auto;
   border: 2px solid black;
 }
-
-.title {
-  font-size: 14px;
+.title, .description {
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   text-align: center;
   margin-top: 10px;
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+.title {
+  font-size: 18px;
+  line-height: 24px;
+}
+.description {
+  font-size: 14px;
 }
