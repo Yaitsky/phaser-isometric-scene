@@ -95,7 +95,7 @@ const Skeleton = new Phaser.Class({
 
       if (this.direction.y !== 0) {
         this.y += this.direction.y * this.speed;
-        this.depth = this.y + 64;
+        this.depth = this.y + 840;
       }
 
       //  Walked far enough?
