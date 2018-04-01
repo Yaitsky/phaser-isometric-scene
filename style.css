@@ -1,0 +1,18 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #eee;
+}
+
+canvas {
+  display: block;
+  margin: 10px auto;
+  border: 2px solid black;
+}
+
+.title {
+  font-size: 14px;
+  text-align: center;
+  margin-top: 10px;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
