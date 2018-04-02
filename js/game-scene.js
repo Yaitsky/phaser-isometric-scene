@@ -10,12 +10,15 @@ class GameScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.json('map', 'images/isometric-grass-and-water.json');
-    this.load.json('baseMap', 'images/isometric_world2.json');
-    this.load.spritesheet('tiles', 'images/isometric-grass-and-water.png', { frameWidth: 64, frameHeight: 64 });
-    this.load.spritesheet('base', 'images/iso-64x64-outside.png', { frameWidth: 64, frameHeight: 64 });
-    this.load.spritesheet('skeleton', 'images/skeleton8.png', { frameWidth: 128, frameHeight: 128 });
-    this.load.image('house', 'images/rem_0002.png');
+    this.load.setPath('images/');
+    this.load.json('map', 'isometric-grass-and-water.json');
+    this.load.json('baseMap', 'isometric_world2.json');
+    this.load.atlas('hero', 'hero.png', 'hero.json');
+    this.load.atlas('candle', 'candle.png', 'candle.json');
+    this.load.spritesheet('tiles', 'isometric-grass-and-water.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet('base', 'iso-64x64-outside.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet('skeleton', 'skeleton8.png', { frameWidth: 128, frameHeight: 128 });
+    this.load.image('house', 'rem_0002.png');
   }
 
   create() {
@@ -51,33 +54,79 @@ class GameScene extends Phaser.Scene {
       let house = this.add.image(270, 370, 'house');
       house.depth = house.y + 860;
     }
+    const addSkeletons = () => {
+      this.skeletons.push(this.add.existing(new Skeleton(this, 240, 290, 'walk', 'southEast', 100)));
+      this.skeletons.push(this.add.existing(new Skeleton(this, 100, 380, 'walk', 'southEast', 230)));
+      this.skeletons.push(this.add.existing(new Skeleton(this, 620, 140, 'walk', 'south', 380)));
+      this.skeletons.push(this.add.existing(new Skeleton(this, 460, 180, 'idle', 'south', 0)));
+      this.skeletons.push(this.add.existing(new Skeleton(this, 1180, 180, 'walk', 'southEast', 160)));
+      this.skeletons.push(this.add.existing(new Skeleton(this, 1450, 320, 'walk', 'southWest', 320)));
+      this.skeletons.push(this.add.existing(new Skeleton(this, 1500, 340, 'walk', 'southWest', 340)));
+      this.skeletons.push(this.add.existing(new Skeleton(this, 1550, 360, 'walk', 'southWest', 330)));
+    }
 
     buildMap();
     placeHouses();
-    
+    // addSkeletons();
+
+    this.hero = this.physics.add.sprite(300, 300, 'hero');
+    this.hero.depth = 1200;
+
+    this.cameras.main.startFollow(this.hero);
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    this.skeletons.push(this.add.existing(new Skeleton(this, 240, 290, 'walk', 'southEast', 100)));
-    this.skeletons.push(this.add.existing(new Skeleton(this, 100, 380, 'walk', 'southEast', 230)));
-    this.skeletons.push(this.add.existing(new Skeleton(this, 620, 140, 'walk', 'south', 380)));
-    this.skeletons.push(this.add.existing(new Skeleton(this, 460, 180, 'idle', 'south', 0)));
-    // this.skeletons.push(this.add.existing(new Skeleton(this, 760, 100, 'attack', 'southEast', 0)));
-    // this.skeletons.push(this.add.existing(new Skeleton(this, 800, 140, 'attack', 'northWest', 0)));
-    // this.skeletons.push(this.add.existing(new Skeleton(this, 750, 480, 'walk', 'east', 200)));
-    // this.skeletons.push(this.add.existing(new Skeleton(this, 1030, 300, 'die', 'west', 0)));
-    // this.skeletons.push(this.add.existing(new Skeleton(this, 1180, 340, 'attack', 'northEast', 0)));
-    this.skeletons.push(this.add.existing(new Skeleton(this, 1180, 180, 'walk', 'southEast', 160)));
-    this.skeletons.push(this.add.existing(new Skeleton(this, 1450, 320, 'walk', 'southWest', 320)));
-    this.skeletons.push(this.add.existing(new Skeleton(this, 1500, 340, 'walk', 'southWest', 340)));
-    this.skeletons.push(this.add.existing(new Skeleton(this, 1550, 360, 'walk', 'southWest', 330)));
+    this.input.mouse.disableContextMenu();
+    this.input.on('pointermove', pointer => {
+      if (pointer.isDown && pointer.leftButtonDown()) {
+        const { x, y } = pointer.manager._tempPoint;
+        this.physics.moveTo(this.hero, x, y, 150);
+        if (x > this.hero.x && y > this.hero.y) {
+          this.hero.play('south');
+        } else if (x > this.hero.x && y < this.hero.y) {
+          this.hero.play('east')
+        } else if (x < this.hero.x && y < this.hero.y) {
+          this.hero.play('north')
+        } else {
+          this.hero.play('west');
+        }
+      }
+    });
+    this.input.on('pointerup', pointer => {
+      this.hero.body.setVelocity(0);
+      this.hero.play('turn');
+    });
+
+    this.anims.create({
+      key: 'turn',
+      frames: [{ key: 'hero', frame: 'villager_walk_south1.png' }]
+    });
+    this.anims.create({
+      key: 'south',
+      frames: this.anims.generateFrameNames('hero', { prefix: 'villager_walk_south', suffix: '.png', start: 0, end: 15 }),
+      frameRate: 16,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'north',
+      frames: this.anims.generateFrameNames('hero', { prefix: 'villager_walk_north', suffix: '.png', start: 0, end: 15 }),
+      frameRate: 16,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'west',
+      frames: this.anims.generateFrameNames('hero', { prefix: 'villager_walk_west', suffix: '.png', start: 0, end: 15 }),
+      frameRate: 16,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'east',
+      frames: this.anims.generateFrameNames('hero', { prefix: 'villager_walk_east', suffix: '.png', start: 0, end: 15 }),
+      frameRate: 16,
+      repeat: -1
+    });
   }
 
   update() {
     this.skeletons.forEach(skeleton => skeleton.update());
-
-    if (this.cursors.right.isDown) this.cameras.main.scrollX += 3;
-    if (this.cursors.left.isDown) this.cameras.main.scrollX -= 3;
-    if (this.cursors.up.isDown) this.cameras.main.scrollY -= 3;
-    if (this.cursors.down.isDown) this.cameras.main.scrollY += 3;
   }
 }
